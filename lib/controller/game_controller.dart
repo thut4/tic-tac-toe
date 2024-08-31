@@ -1,5 +1,9 @@
+import 'dart:math';
+
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
+
+enum AIDifficulty { beginner, intermediate, expert }
 
 class GameController extends ChangeNotifier {
   final AudioPlayer _audioPlayer = AudioPlayer();
@@ -9,18 +13,24 @@ class GameController extends ChangeNotifier {
   String _winner = '';
   bool _isOver = false;
   bool _isPlayingWithAI = false;
+  AIDifficulty _aiDifficulty = AIDifficulty.beginner;
+
   // Getter
   List<String> get board => _board;
   String get currentPlayer => _currentPlayer;
   String get winner => _winner;
   bool get isOver => _isOver;
   bool get isAi => _isPlayingWithAI;
+  AIDifficulty get aiDifficulty => _aiDifficulty;
 
   // Set the mode to play with AI or another player
-  void setPlayMode(bool playWithAI) {
+  void setPlayMode(bool playWithAI,
+      {AIDifficulty difficulty = AIDifficulty.beginner}) {
     _isPlayingWithAI = playWithAI;
+    _aiDifficulty = difficulty;
     resetGame();
   }
+
   // move function
   void makeMove(int index) {
     if (_board[index] == '' && !_isOver) {
@@ -51,8 +61,43 @@ class GameController extends ChangeNotifier {
     });
   }
 
-  // Simple AI to find the best move
+  // AI logic based on difficulty
   int _findBestMove() {
+    switch (_aiDifficulty) {
+      case AIDifficulty.beginner:
+        return _findRandomMove();
+      case AIDifficulty.intermediate:
+        return _findRandomOrBestMove(50);
+      case AIDifficulty.expert:
+      default:
+        return _findBestMoveExpert();
+    }
+  }
+
+  // Random move for beginner AI
+  int _findRandomMove() {
+    List<int> availableMoves = [];
+    for (int i = 0; i < 9; i++) {
+      if (_board[i] == '') {
+        availableMoves.add(i);
+      }
+    }
+    availableMoves.shuffle();
+    return availableMoves.first;
+  }
+
+  // Random move or best move based on probability (intermediate)
+  int _findRandomOrBestMove(int probabilityOfBestMove) {
+    final random = Random();
+    if (random.nextInt(100) < probabilityOfBestMove) {
+      return _findBestMoveExpert();
+    } else {
+      return _findRandomMove();
+    }
+  }
+
+  // Best move logic for expert AI
+  int _findBestMoveExpert() {
     // Check if AI can win
     for (int i = 0; i < 9; i++) {
       if (_board[i] == '') {
@@ -115,7 +160,7 @@ class GameController extends ChangeNotifier {
     return false;
   }
 
-  //reset function
+  // reset function
   void resetGame() {
     _board = List.filled(9, '');
     _currentPlayer = 'X';
@@ -124,7 +169,7 @@ class GameController extends ChangeNotifier {
     notifyListeners();
   }
 
-  // play sound when user win
+  // play sound when user wins
   void _playWinSound() async {
     await _audioPlayer.play(AssetSource('sound/victory.mp3'));
   }

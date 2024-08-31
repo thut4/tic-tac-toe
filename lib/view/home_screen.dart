@@ -49,31 +49,61 @@ class _HomeScreenState extends State<HomeScreen>
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             if (!gameProvider.isOver)
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  SizedBox(
-                    width: 150,
-                    child: MainButton(
-                      onTap: () => gameProvider.setPlayMode(false),
-                      color: gameProvider.isAi
-                          ? AppColor.blueColor
-                          : AppColor.greenColor,
-                      name: '2 Players',
+              SingleChildScrollView(
+                padding: EdgeInsets.symmetric(horizontal: 10),
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    SizedBox(
+                      child: MainButton(
+                        onTap: () => gameProvider.setPlayMode(false),
+                        color: gameProvider.isAi
+                            ? AppColor.redColor
+                            : AppColor.greenColor,
+                        name: '2 Players',
+                      ),
                     ),
-                  ),
-                  const SizedBox(width: 20),
-                  SizedBox(
-                    width: 150,
-                    child: MainButton(
-                      onTap: () => gameProvider.setPlayMode(true),
-                      color: gameProvider.isAi
-                          ? AppColor.greenColor
-                          : AppColor.redColor,
-                      name: 'Play with AI',
+                    const SizedBox(width: 10),
+                    SizedBox(
+                      child: MainButton(
+                        onTap: () => gameProvider.setPlayMode(true,
+                            difficulty: AIDifficulty.beginner),
+                        color: gameProvider.isAi &&
+                                gameProvider.aiDifficulty ==
+                                    AIDifficulty.beginner
+                            ? AppColor.greenColor
+                            : AppColor.redColor,
+                        name: 'AI (Beginner)',
+                      ),
                     ),
-                  ),
-                ],
+                    const SizedBox(width: 10),
+                    SizedBox(
+                      child: MainButton(
+                        onTap: () => gameProvider.setPlayMode(true,
+                            difficulty: AIDifficulty.intermediate),
+                        color: gameProvider.isAi &&
+                                gameProvider.aiDifficulty ==
+                                    AIDifficulty.intermediate
+                            ? AppColor.greenColor
+                            : AppColor.redColor,
+                        name: 'AI (Intermediate)',
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    SizedBox(
+                      child: MainButton(
+                        onTap: () => gameProvider.setPlayMode(true,
+                            difficulty: AIDifficulty.expert),
+                        color: gameProvider.isAi &&
+                                gameProvider.aiDifficulty == AIDifficulty.expert
+                            ? AppColor.greenColor
+                            : AppColor.redColor,
+                        name: 'AI (Expert)',
+                      ),
+                    ),
+                  ],
+                ),
               ),
             const SizedBox(height: 10),
             _buildGameBoard(gameProvider),
